@@ -1,5 +1,6 @@
 # todo_list.py
-
+import tkinter as tk
+from tkinter import messagebox
 import json
 import os
 from datetime import datetime, timedelta
@@ -84,44 +85,74 @@ def send_notification(task, message):
     # Placeholder for actual notification sending mechanism
     print(f"Reminder: {message} for task '{task['task']}'")
 
-def main():
-    tasks = load_tasks()
-    
-    while True:
-        print("\n===== To-Do List Menu =====")
-        print("1. Add Task")
-        print("2. Mark Task Complete")
-        print("3. Delete Task")
-        print("4. List Tasks")
-        print("5. Check Approaching Deadlines")
-        print("6. Exit")
-        
-        choice = input("Enter your choice (1-5): ")
-        
-        if choice == '1':
-            task = input("Enter task: ")
-            deadline = input("Enter deadline (optional, format YYYY-MM-DD): ")
-            add_task(tasks, task, deadline)
-            save_tasks(tasks)
-        elif choice == '2':
-            index = int(input("Enter index of task to mark complete: ")) - 1
-            mark_task_complete(tasks, index)
-            save_tasks(tasks)
-        elif choice == '3':
-            index = int(input("Enter index of task to delete: ")) - 1
-            delete_task(tasks, index)
-            save_tasks(tasks)
-        elif choice == '4':
-            list_tasks(tasks)
-        elif choice == '5':
-            check_approaching_deadlines(tasks)
-        elif choice == '6':
-            print("Exiting...")
-            break
-        else:
-            print("Invalid choice. Please enter a number from 1 to 5.")
+# Function to handle button click events
 
+def add_task_click():
+    task = entry_task.get()
+    deadline = entry_deadline.get()
+    add_task(tasks, task, deadline)
     save_tasks(tasks)
+    list_tasks_in_gui()
 
-if __name__ == "__main__":
-    main()
+def mark_complete_click():
+    index = int(entry_index.get()) - 1
+    mark_task_complete(tasks, index)
+    save_tasks(tasks)
+    list_tasks_in_gui()
+
+def delete_task_click():
+    index = int(entry_index.get()) - 1
+    delete_task(tasks, index)
+    save_tasks(tasks)
+    list_tasks_in_gui()
+
+def check_approaching_deadlines_click():
+    check_approaching_deadlines(tasks)
+
+def list_tasks_in_gui():
+    list_tasks(tasks)
+    # Update GUI list view here
+
+# Initialize tkinter GUI
+
+root = tk.Tk()
+root.title("To-Do List App")
+
+# Create GUI components
+
+label_task = tk.Label(root, text="Task:")
+label_task.grid(row=0, column=0, padx=10, pady=10)
+
+entry_task = tk.Entry(root, width=50)
+entry_task.grid(row=0, column=1, padx=10, pady=10)
+
+label_deadline = tk.Label(root, text="Deadline (YYYY-MM-DD):")
+label_deadline.grid(row=1, column=0, padx=10, pady=10)
+
+entry_deadline = tk.Entry(root, width=50)
+entry_deadline.grid(row=1, column=1, padx=10, pady=10)
+
+button_add_task = tk.Button(root, text="Add Task", command=add_task_click)
+button_add_task.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="WE")
+
+label_index = tk.Label(root, text="Task Index:")
+label_index.grid(row=3, column=0, padx=10, pady=10)
+
+entry_index = tk.Entry(root, width=50)
+entry_index.grid(row=3, column=1, padx=10, pady=10)
+
+button_mark_complete = tk.Button(root, text="Mark Complete", command=mark_complete_click)
+button_mark_complete.grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="WE")
+
+button_delete_task = tk.Button(root, text="Delete Task", command=delete_task_click)
+button_delete_task.grid(row=5, column=0, columnspan=2, padx=10, pady=10, sticky="WE")
+
+button_check_deadlines = tk.Button(root, text="Check Approaching Deadlines", command=check_approaching_deadlines_click)
+button_check_deadlines.grid(row=6, column=0, columnspan=2, padx=10, pady=10, sticky="WE")
+
+# Load tasks initially
+tasks = load_tasks()
+list_tasks_in_gui()
+
+# Start the GUI event loop
+root.mainloop()
